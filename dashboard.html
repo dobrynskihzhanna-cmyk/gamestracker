@@ -28,7 +28,10 @@
           <h1>Ученики</h1>
           <p class="muted">Краткая сводка по всем игровым попыткам.</p>
         </div>
-        <button id="refresh-button" class="button button--secondary" type="button">Обновить данные</button>
+        <div class="page-actions">
+          <button id="refresh-button" class="button button--secondary" type="button">Обновить данные</button>
+          <button id="add-student-button" class="button button--primary" type="button" disabled>Добавить ученика</button>
+        </div>
       </section>
 
       <div id="page-error" class="notice notice--error" role="alert" hidden></div>
@@ -54,6 +57,19 @@
           <strong id="average-result">—</strong>
           <span>по завершённым попыткам</span>
         </article>
+      </section>
+
+      <section class="panel games-panel" aria-labelledby="games-title">
+        <div class="panel__header">
+          <div>
+            <h2 id="games-title">Игры</h2>
+            <p id="games-subtitle" class="muted small">Загрузка данных…</p>
+          </div>
+        </div>
+        <div id="games-list" class="games-list"></div>
+        <div id="games-empty" class="empty-state empty-state--compact" hidden>
+          <p>В коллекции <code>games</code> пока нет игр.</p>
+        </div>
       </section>
 
       <section class="panel" aria-labelledby="students-title">
@@ -95,6 +111,91 @@
         </div>
       </section>
     </main>
+
+    <dialog id="add-student-dialog" class="modal">
+      <form id="add-student-form" class="modal__card" method="dialog" novalidate>
+        <div class="modal__header">
+          <div>
+            <p class="eyebrow">Новый ученик</p>
+            <h2>Добавить ученика</h2>
+          </div>
+          <button id="close-student-dialog" class="modal__close" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <p class="muted">Укажите имя. Технический ID будет выбран автоматически.</p>
+
+        <div class="form-stack">
+          <label class="field">
+            <span>Имя ученика</span>
+            <input id="new-student-name" name="displayName" type="text" maxlength="100" autocomplete="off" placeholder="Например, Анна" required>
+          </label>
+          <label class="field">
+            <span>Технический ID</span>
+            <input id="new-student-id" type="text" readonly aria-describedby="student-id-help">
+            <small id="student-id-help" class="field-help">Создаётся автоматически и используется только в персональных ссылках.</small>
+          </label>
+          <label class="field">
+            <span>Заметка <small class="optional">необязательно</small></span>
+            <textarea id="new-student-notes" name="notes" maxlength="500" placeholder="Например, группа или уровень"></textarea>
+          </label>
+        </div>
+
+        <p id="add-student-error" class="form-error" role="alert" aria-live="polite"></p>
+
+        <div class="modal__actions">
+          <button id="cancel-student-button" class="button button--secondary" type="button">Отмена</button>
+          <button id="save-student-button" class="button button--primary" type="submit">
+            <span class="button__label">Добавить</span>
+            <span class="spinner spinner--button" aria-hidden="true" hidden></span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="edit-game-dialog" class="modal">
+      <form id="edit-game-form" class="modal__card" method="dialog" novalidate>
+        <div class="modal__header">
+          <div>
+            <p class="eyebrow">Настройки игры</p>
+            <h2>Изменить игру</h2>
+          </div>
+          <button id="close-game-dialog" class="modal__close" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="form-stack">
+          <label class="field">
+            <span>Название игры</span>
+            <input id="edit-game-title" type="text" maxlength="100" required>
+          </label>
+          <label class="field">
+            <span>Постоянный gameId</span>
+            <input id="edit-game-id" type="text" readonly>
+            <small class="field-help">Идентификатор нельзя менять: он связан с историей результатов.</small>
+          </label>
+          <label class="field">
+            <span>Адрес игры на GitHub Pages</span>
+            <input id="edit-game-url" type="url" maxlength="500" placeholder="https://example.github.io/game/" required>
+          </label>
+          <label class="switch-field">
+            <input id="edit-game-active" type="checkbox">
+            <span>
+              <strong>Игра активна</strong>
+              <small>Для активной игры создаются персональные ссылки.</small>
+            </span>
+          </label>
+        </div>
+
+        <p id="edit-game-error" class="form-error" role="alert" aria-live="polite"></p>
+
+        <div class="modal__actions">
+          <button id="cancel-game-button" class="button button--secondary" type="button">Отмена</button>
+          <button id="save-game-button" class="button button--primary" type="submit">
+            <span class="button__label">Сохранить</span>
+            <span class="spinner spinner--button" aria-hidden="true" hidden></span>
+          </button>
+        </div>
+      </form>
+    </dialog>
     <script type="module" src="js/dashboard-page.js"></script>
   </body>
 </html>

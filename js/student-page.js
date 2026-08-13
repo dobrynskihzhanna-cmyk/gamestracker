@@ -28,12 +28,81 @@ const elements = {
   empty: document.querySelector("#history-empty"),
   emptyText: document.querySelector("#history-empty-text"),
   tableWrap: document.querySelector("#history-table-wrap"),
-  tableBody: document.querySelector("#history-table-body")
+  tableBody: document.querySelector("#history-table-body"),
+  gameLinksList: document.querySelector("#game-links-list"),
+  gameLinksEmpty: document.querySelector("#game-links-empty")
 };
 
 const studentId = new URLSearchParams(window.location.search).get("student")?.trim();
 let results = [];
 let gameNames = new Map();
+
+function buildPersonalGameUrl(gameUrl) {
+  try {
+    const url = new URL(gameUrl);
+    url.searchParams.set("student", studentId);
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+async function copyGameLink(button, url) {
+  const originalText = button.textContent;
+  try {
+    await navigator.clipboard.writeText(url);
+    button.textContent = "Скопировано";
+  } catch {
+    const input = button.closest(".game-link-card").querySelector("input");
+    input.focus();
+    input.select();
+    button.textContent = "Выделено";
+  }
+  setTimeout(() => { button.textContent = originalText; }, 1800);
+}
+
+function renderGameLinks(games) {
+  elements.gameLinksList.replaceChildren();
+  const activeGames = games
+    .filter((game) => game.active !== false && buildPersonalGameUrl(game.url))
+    .sort((a, b) => String(a.title || a.gameId || a.id).localeCompare(String(b.title || b.gameId || b.id), "ru"));
+
+  elements.gameLinksEmpty.hidden = activeGames.length > 0;
+  activeGames.forEach((game) => {
+    const title = game.title || game.gameId || game.id;
+    const url = buildPersonalGameUrl(game.url);
+    const card = document.createElement("article");
+    card.className = "game-link-card";
+    const heading = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = title;
+    const id = document.createElement("small");
+    id.textContent = game.gameId || game.id;
+    heading.append(name, id);
+
+    const controls = document.createElement("div");
+    controls.className = "game-link-controls";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = url;
+    input.readOnly = true;
+    input.setAttribute("aria-label", `Персональная ссылка: ${title}`);
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "button button--secondary";
+    copyButton.textContent = "Скопировать";
+    copyButton.addEventListener("click", () => copyGameLink(copyButton, url));
+    const openLink = document.createElement("a");
+    openLink.className = "button button--quiet";
+    openLink.href = url;
+    openLink.target = "_blank";
+    openLink.rel = "noopener noreferrer";
+    openLink.textContent = "Открыть ↗";
+    controls.append(input, copyButton, openLink);
+    card.append(heading, controls);
+    elements.gameLinksList.append(card);
+  });
+}
 
 function updateStats() {
   const completedPercentages = results
@@ -141,6 +210,7 @@ async function loadStudentPage() {
 
     results = sortResultsNewestFirst(studentResults);
     fillGameFilter(games);
+    renderGameLinks(games);
     updateStats();
     renderHistory();
     elements.filter.disabled = false;
