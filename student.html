@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="История игровых попыток ученика">
+    <title>История ученика — NeuroStars Games Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="brand" href="dashboard.html">
+          <span class="brand__mark" aria-hidden="true">N</span>
+          <span>NeuroStars <small>Games Tracker</small></span>
+        </a>
+        <div class="account-actions">
+          <span id="admin-email" class="account-email"></span>
+          <button id="logout-button" class="button button--quiet" type="button">Выйти</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container page-content">
+      <a class="back-link" href="dashboard.html">← Все ученики</a>
+
+      <section class="student-heading">
+        <div class="student-avatar" aria-hidden="true" id="student-avatar">—</div>
+        <div>
+          <p class="eyebrow">История ученика</p>
+          <h1 id="student-name">Загрузка…</h1>
+          <p id="student-id" class="muted">—</p>
+        </div>
+      </section>
+
+      <div id="page-error" class="notice notice--error" role="alert" hidden></div>
+
+      <section class="stats-grid stats-grid--three" aria-label="Статистика ученика">
+        <article class="stat-card">
+          <span class="stat-card__label">Всего попыток</span>
+          <strong id="attempts-count">—</strong>
+          <span>за всё время</span>
+        </article>
+        <article class="stat-card stat-card--accent">
+          <span class="stat-card__label">Средний результат</span>
+          <strong id="average-result">—</strong>
+          <span>завершённые попытки</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-card__label">Лучший результат</span>
+          <strong id="best-result">—</strong>
+          <span>личный максимум</span>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="history-title">
+        <div class="panel__header">
+          <div>
+            <h2 id="history-title">История попыток</h2>
+            <p id="history-subtitle" class="muted small">Загрузка данных…</p>
+          </div>
+          <label class="select-field">
+            <span>Игра</span>
+            <select id="game-filter" disabled>
+              <option value="">Все игры</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="history-loading" class="loading-state" role="status">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Загружаем историю…</span>
+        </div>
+
+        <div id="history-empty" class="empty-state" hidden>
+          <span class="empty-state__icon" aria-hidden="true">☆</span>
+          <h3>Попыток пока нет</h3>
+          <p id="history-empty-text">Результаты появятся после подключения и прохождения игры.</p>
+        </div>
+
+        <div id="history-table-wrap" class="table-wrap" hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Игра</th>
+                <th>Результат</th>
+                <th>Ошибки</th>
+                <th>Время</th>
+                <th>Статус</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="js/student-page.js"></script>
+  </body>
+</html>

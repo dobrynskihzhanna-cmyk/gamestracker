@@ -1,0 +1,8 @@
+# Local editor and operating-system files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Generated GitHub Pages directory (created only in CI)
+_site/

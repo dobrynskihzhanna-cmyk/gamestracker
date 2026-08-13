@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Вход в административный трекер NeuroStars Games Tracker">
+    <title>Вход — NeuroStars Games Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body class="login-page">
+    <main class="login-layout">
+      <section class="brand-panel" aria-labelledby="brand-title">
+        <a class="brand brand--light" href="index.html" aria-label="NeuroStars Games Tracker">
+          <span class="brand__mark" aria-hidden="true">N</span>
+          <span>NeuroStars</span>
+        </a>
+        <div class="brand-panel__content">
+          <p class="eyebrow eyebrow--light">Games Tracker</p>
+          <h1 id="brand-title">Результаты обучения в одном месте</h1>
+          <p>Следите за прогрессом учеников и просматривайте историю игровых попыток.</p>
+        </div>
+        <p class="brand-panel__footer">Административная часть</p>
+      </section>
+
+      <section class="login-form-panel" aria-labelledby="login-title">
+        <div class="login-card">
+          <p class="eyebrow">Защищённый доступ</p>
+          <h2 id="login-title">Вход для администратора</h2>
+          <p class="muted">Используйте Email и пароль администратора из Firebase Authentication.</p>
+
+          <div id="config-notice" class="notice notice--warning" role="alert" hidden>
+            Сначала вставьте ваш <code>firebaseConfig</code> в файл <code>js/firebase-config.js</code>.
+          </div>
+
+          <form id="login-form" class="form-stack" novalidate>
+            <label class="field">
+              <span>Email</span>
+              <input id="email" name="email" type="email" autocomplete="username" placeholder="admin@example.com" required>
+            </label>
+            <label class="field">
+              <span>Пароль</span>
+              <span class="password-field">
+                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Введите пароль" required>
+                <button id="toggle-password" class="icon-button" type="button" aria-label="Показать пароль" title="Показать пароль">
+                  <span aria-hidden="true">●</span>
+                </button>
+              </span>
+            </label>
+            <p id="login-error" class="form-error" role="alert" aria-live="polite"></p>
+            <button id="login-button" class="button button--primary button--full" type="submit">
+              <span class="button__label">Войти</span>
+              <span class="spinner spinner--button" aria-hidden="true" hidden></span>
+            </button>
+          </form>
+          <p class="privacy-note">Доступ к данным проверяется Firebase Authentication и Firestore Rules.</p>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="js/login-page.js"></script>
+  </body>
+</html>

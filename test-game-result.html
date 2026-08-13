@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Тест отправки результата — NeuroStars</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+    <main class="container test-page">
+      <section class="test-card" aria-labelledby="test-title">
+        <p class="eyebrow">Служебная тестовая страница</p>
+        <h1 id="test-title">Проверка отправки результата</h1>
+        <p class="muted">Страница создаст одну тестовую попытку в коллекции <code>gameResults</code>.</p>
+
+        <dl class="test-details">
+          <div><dt>Ученик</dt><dd id="student-value">—</dd></div>
+          <div><dt>Игра</dt><dd>forest-trails</dd></div>
+          <div><dt>Правильных ответов</dt><dd>8 из 10</dd></div>
+          <div><dt>Ошибок</dt><dd>2</dd></div>
+          <div><dt>Результат</dt><dd>80%</dd></div>
+          <div><dt>Время</dt><dd>95 секунд</dd></div>
+        </dl>
+
+        <div id="test-status" class="notice" role="status" aria-live="polite" hidden></div>
+
+        <button id="send-test-result" class="button button--primary button--full" type="button" disabled>
+          <span class="button__label">Отправить тестовый результат</span>
+          <span class="spinner spinner--button" aria-hidden="true" hidden></span>
+        </button>
+
+        <p class="privacy-note">Кнопка работает только один раз за эту попытку. Повторное нажатие не создаст второй документ.</p>
+      </section>
+    </main>
+    <script type="module" src="js/test-game-result-page.js"></script>
+  </body>
+</html>
