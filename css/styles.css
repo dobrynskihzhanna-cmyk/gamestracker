@@ -272,6 +272,10 @@ select:focus-visible,
   border-top-color: #fff;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
