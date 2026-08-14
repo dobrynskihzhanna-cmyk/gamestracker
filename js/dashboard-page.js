@@ -24,9 +24,17 @@ import {
 const elements = {
   adminEmail: document.querySelector("#admin-email"),
   logout: document.querySelector("#logout-button"),
+  studentsTab: document.querySelector("#students-tab"),
+  gamesTab: document.querySelector("#games-tab"),
+  pageEyebrow: document.querySelector("#page-eyebrow"),
+  pageTitle: document.querySelector("#page-title"),
+  pageDescription: document.querySelector("#page-description"),
   refresh: document.querySelector("#refresh-button"),
   addStudent: document.querySelector("#add-student-button"),
   error: document.querySelector("#page-error"),
+  summary: document.querySelector("#summary"),
+  studentsPanel: document.querySelector("#students-panel"),
+  gamesPanel: document.querySelector("#games-panel"),
   studentsCount: document.querySelector("#students-count"),
   attemptsCount: document.querySelector("#attempts-count"),
   gamesCount: document.querySelector("#games-count"),
@@ -66,6 +74,30 @@ let students = [];
 let results = [];
 let games = [];
 let editingGameDocumentId = null;
+
+function showDashboardView() {
+  const showGames = window.location.hash === "#games";
+
+  elements.summary.hidden = showGames;
+  elements.studentsPanel.hidden = showGames;
+  elements.gamesPanel.hidden = !showGames;
+  elements.addStudent.hidden = showGames;
+
+  elements.studentsTab.classList.toggle("admin-nav__link--active", !showGames);
+  elements.gamesTab.classList.toggle("admin-nav__link--active", showGames);
+  elements.studentsTab.toggleAttribute("aria-current", !showGames);
+  elements.gamesTab.toggleAttribute("aria-current", showGames);
+
+  setText(elements.pageEyebrow, showGames ? "Управление играми" : "Панель администратора");
+  setText(elements.pageTitle, showGames ? "Игры" : "Ученики");
+  setText(
+    elements.pageDescription,
+    showGames
+      ? "Подключённые обучающие игры и их настройки."
+      : "Краткая сводка по всем игровым попыткам."
+  );
+  document.title = `${showGames ? "Игры" : "Ученики"} — NeuroStars Games Tracker`;
+}
 
 function openEditGameDialog(game) {
   editingGameDocumentId = game.id;
@@ -339,6 +371,7 @@ elements.search.addEventListener("input", () => {
   renderStudents(filtered);
 });
 
+window.addEventListener("hashchange", showDashboardView);
 elements.refresh.addEventListener("click", loadDashboard);
 elements.addStudent.addEventListener("click", openAddStudentDialog);
 elements.addForm.addEventListener("submit", handleAddStudent);
@@ -360,6 +393,8 @@ elements.gameDialog.addEventListener("cancel", (event) => {
   if (elements.saveGame.disabled) event.preventDefault();
 });
 elements.logout.addEventListener("click", () => logoutAdmin().catch(console.error));
+
+showDashboardView();
 
 try {
   const user = await requireAdmin();
