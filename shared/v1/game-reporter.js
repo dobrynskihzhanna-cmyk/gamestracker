@@ -117,7 +117,7 @@ function validateResult(result) {
     );
   }
 
-  return {
+  const validatedResult = {
     correctAnswers,
     totalTasks,
     errors,
@@ -125,6 +125,44 @@ function validateResult(result) {
     durationSeconds,
     completed: result.completed
   };
+
+  const extendedFields = [
+    "gameName", "topic", "correct", "total", "mistakes",
+    "percent", "score", "duration", "status"
+  ];
+  const hasExtendedResult = extendedFields.some((field) => result[field] !== undefined);
+
+  if (!hasExtendedResult) return { core: validatedResult, extended: null };
+
+  if (typeof result.gameName !== "string" || !result.gameName.trim() || result.gameName.length > 120) {
+    throw new GameReporterError(GameReporterErrorCode.INVALID_RESULT, "Поле gameName заполнено неверно.");
+  }
+  if (typeof result.topic !== "string" || !result.topic.trim() || result.topic.length > 120) {
+    throw new GameReporterError(GameReporterErrorCode.INVALID_RESULT, "Поле topic заполнено неверно.");
+  }
+
+  const extended = {
+    gameName: result.gameName.trim(),
+    topic: result.topic.trim(),
+    correct: requireWholeNumber(result.correct, "correct", { max: totalTasks }),
+    total: requireWholeNumber(result.total, "total", { min: 1 }),
+    mistakes: requireWholeNumber(result.mistakes, "mistakes"),
+    percent: requireWholeNumber(result.percent, "percent", { max: 100 }),
+    score: requireWholeNumber(result.score, "score"),
+    duration: requireWholeNumber(result.duration, "duration"),
+    status: result.status
+  };
+
+  if (extended.total !== totalTasks || extended.correct !== correctAnswers ||
+      extended.mistakes !== errors || extended.percent !== percentage ||
+      extended.duration !== durationSeconds || extended.status !== "completed" || !result.completed) {
+    throw new GameReporterError(
+      GameReporterErrorCode.INVALID_RESULT,
+      "Расширенные поля результата не совпадают с основными данными попытки."
+    );
+  }
+
+  return { core: validatedResult, extended };
 }
 
 function getReporterApp(firebaseConfig) {
@@ -182,7 +220,7 @@ export function initializeGameReporter({ firebaseConfig, gameId, studentId = rea
   let submissionPromise = null;
 
   async function performSubmission(result) {
-    const validatedResult = validateResult(result);
+    const { core: validatedResult, extended } = validateResult(result);
     const authResult = await anonymousUserPromise;
     if (authResult.error) throw authResult.error;
     const user = authResult.user;
@@ -197,6 +235,10 @@ export function initializeGameReporter({ firebaseConfig, gameId, studentId = rea
       authUid: user.uid,
       resultVersion: REPORTER_VERSION
     };
+
+    if (extended) {
+      Object.assign(resultData, extended, { completedAt: serverTimestamp() });
+    }
 
     try {
       await setDoc(resultReference, resultData);
