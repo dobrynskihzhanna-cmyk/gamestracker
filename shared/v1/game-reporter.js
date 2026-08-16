@@ -19,6 +19,7 @@ const REPORTER_VERSION = 1;
 const REPORTER_APP_NAME = "neurostars-game-reporter-v1";
 const STUDENT_ID_PATTERN = /^[A-Za-z0-9_-]{1,80}$/;
 const GAME_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const TOPIC_MAX_LENGTH = 80;
 
 export const GameReporterErrorCode = Object.freeze({
   INVALID_CONFIG: "INVALID_CONFIG",
@@ -117,13 +118,32 @@ function validateResult(result) {
     );
   }
 
+  let topic;
+  if (result.topic !== undefined) {
+    if (typeof result.topic !== "string") {
+      throw new GameReporterError(
+        GameReporterErrorCode.INVALID_RESULT,
+        "Поле topic должно быть строкой."
+      );
+    }
+
+    topic = result.topic.trim();
+    if (!topic || topic.length > TOPIC_MAX_LENGTH) {
+      throw new GameReporterError(
+        GameReporterErrorCode.INVALID_RESULT,
+        `Поле topic должно содержать от 1 до ${TOPIC_MAX_LENGTH} символов.`
+      );
+    }
+  }
+
   return {
     correctAnswers,
     totalTasks,
     errors,
     percentage,
     durationSeconds,
-    completed: result.completed
+    completed: result.completed,
+    ...(topic === undefined ? {} : { topic })
   };
 }
 
@@ -205,7 +225,8 @@ export function initializeGameReporter({ firebaseConfig, gameId, studentId = rea
         documentId,
         studentId,
         gameId,
-        percentage: validatedResult.percentage
+        percentage: validatedResult.percentage,
+        ...(validatedResult.topic === undefined ? {} : { topic: validatedResult.topic })
       });
     } catch (error) {
       throw new GameReporterError(

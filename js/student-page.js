@@ -1,5 +1,6 @@
 import { requireAdmin, logoutAdmin } from "./auth.js";
 import { getAllGames, getDataErrorMessage, getStudent, getStudentResults } from "./firestore.js";
+import { getGameName, getResultGameName } from "./result-display.js";
 import {
   formatDate,
   formatDuration,
@@ -69,7 +70,8 @@ function renderGameLinks(games) {
 
   elements.gameLinksEmpty.hidden = activeGames.length > 0;
   activeGames.forEach((game) => {
-    const title = game.title || game.gameId || game.id;
+    const gameId = game.gameId || game.id;
+    const title = getGameName(gameId, game.title, gameNames);
     const url = buildPersonalGameUrl(game.url);
     const card = document.createElement("article");
     card.className = "game-link-card";
@@ -77,7 +79,7 @@ function renderGameLinks(games) {
     const name = document.createElement("strong");
     name.textContent = title;
     const id = document.createElement("small");
-    id.textContent = game.gameId || game.id;
+    id.textContent = gameId;
     heading.append(name, id);
 
     const controls = document.createElement("div");
@@ -144,7 +146,7 @@ function renderHistory() {
   filtered.forEach((result) => {
     const row = document.createElement("tr");
     row.append(makeCell(formatDate(result.createdAt)));
-    row.append(makeCell(gameNames.get(result.gameId) || result.gameId || "Неизвестная игра"));
+    row.append(makeCell(getResultGameName(result, gameNames)));
 
     const score = Number.isFinite(Number(result.correctAnswers)) && Number.isFinite(Number(result.totalTasks))
       ? `${result.correctAnswers} из ${result.totalTasks} · ${formatPercentage(result.percentage)}`
@@ -170,7 +172,7 @@ function fillGameFilter(games) {
     .sort((a, b) => String(a.title || a.gameId || a.id).localeCompare(String(b.title || b.gameId || b.id), "ru"))
     .forEach((game) => {
       const id = game.gameId || game.id;
-      const title = game.title || id;
+      const title = getGameName(id, game.title, gameNames);
       gameNames.set(id, title);
       const option = document.createElement("option");
       option.value = id;
