@@ -9,7 +9,7 @@ import {
   getStudent,
   getStudentResults,
   updateLessonRecord
-} from "./firestore.js";
+} from "./firestore.js?v=20260817-lessons1";
 import { getGameName, getResultGameName } from "./result-display.js";
 import {
   formatDate,
