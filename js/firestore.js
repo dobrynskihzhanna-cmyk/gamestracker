@@ -1,11 +1,14 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
   query,
   runTransaction,
   serverTimestamp,
+  setDoc,
+  updateDoc,
   where
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 import { requireFirebaseConfig } from "./firebase-config.js";
@@ -46,6 +49,84 @@ export async function getStudentResults(studentId) {
   );
   const snapshot = await getDocs(resultsQuery);
   return snapshot.docs.map(mapDocument);
+}
+
+export async function getLessonRecords(studentId) {
+  const { db } = requireFirebaseConfig();
+  const recordsQuery = query(
+    collection(db, "lesson_records"),
+    where("student_id", "==", studentId)
+  );
+  const snapshot = await getDocs(recordsQuery);
+  return snapshot.docs.map(mapDocument);
+}
+
+function normalizeLessonRecord(record) {
+  const normalized = {
+    student_id: String(record.student_id || "").trim(),
+    date: String(record.date || "").trim(),
+    lesson_content: String(record.lesson_content || "").trim(),
+    lesson_result: String(record.lesson_result || "").trim(),
+    support_used: Array.isArray(record.support_used)
+      ? [...new Set(record.support_used.map((value) => String(value).trim()).filter(Boolean))]
+      : [],
+    next_step: String(record.next_step || "").trim(),
+    engagement_state: Array.isArray(record.engagement_state)
+      ? [...new Set(record.engagement_state.map((value) => String(value).trim()).filter(Boolean))]
+      : [],
+    independence_level: String(record.independence_level || "").trim(),
+    difficulty_type: String(record.difficulty_type || "").trim(),
+    teacher_observation: String(record.teacher_observation || "").trim(),
+    private_teacher_note: String(record.private_teacher_note || "").trim()
+  };
+
+  if (!/^s\d{3,}$/i.test(normalized.student_id)) throw new Error("INVALID_LESSON_STUDENT");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized.date)) throw new Error("INVALID_LESSON_DATE");
+  if (!normalized.lesson_content || normalized.lesson_content.length > 2000) throw new Error("INVALID_LESSON_CONTENT");
+  if (!normalized.lesson_result || normalized.lesson_result.length > 2000) throw new Error("INVALID_LESSON_RESULT");
+  if (!normalized.support_used.length || normalized.support_used.length > 20) throw new Error("INVALID_LESSON_SUPPORT");
+  if (!normalized.next_step || normalized.next_step.length > 2000) throw new Error("INVALID_LESSON_NEXT_STEP");
+  if (normalized.engagement_state.length > 20) throw new Error("INVALID_LESSON_ENGAGEMENT");
+  if (normalized.independence_level.length > 100) throw new Error("INVALID_LESSON_INDEPENDENCE");
+  if (normalized.difficulty_type.length > 150) throw new Error("INVALID_LESSON_DIFFICULTY");
+  if (normalized.teacher_observation.length > 3000) throw new Error("INVALID_LESSON_OBSERVATION");
+  if (normalized.private_teacher_note.length > 3000) throw new Error("INVALID_LESSON_PRIVATE_NOTE");
+
+  return normalized;
+}
+
+export async function createLessonRecord(record) {
+  const { db } = requireFirebaseConfig();
+  const normalized = normalizeLessonRecord(record);
+  const recordReference = doc(collection(db, "lesson_records"));
+
+  await setDoc(recordReference, {
+    lesson_record_id: recordReference.id,
+    ...normalized,
+    created_at: serverTimestamp(),
+    updated_at: serverTimestamp()
+  });
+
+  return recordReference.id;
+}
+
+export async function updateLessonRecord(recordId, record) {
+  const { db } = requireFirebaseConfig();
+  const normalizedId = String(recordId || "").trim();
+  if (!normalizedId) throw new Error("INVALID_LESSON_ID");
+  const normalized = normalizeLessonRecord(record);
+
+  await updateDoc(doc(db, "lesson_records", normalizedId), {
+    ...normalized,
+    updated_at: serverTimestamp()
+  });
+}
+
+export async function deleteLessonRecord(recordId) {
+  const { db } = requireFirebaseConfig();
+  const normalizedId = String(recordId || "").trim();
+  if (!normalizedId) throw new Error("INVALID_LESSON_ID");
+  await deleteDoc(doc(db, "lesson_records", normalizedId));
 }
 
 export function getNextStudentId(students) {
@@ -163,4 +244,19 @@ export function getGameUpdateErrorMessage(error) {
   if (error?.code === "permission-denied") return "Firestore Rules пока не разрешают администратору изменять игры.";
   if (error?.code === "unavailable") return "Firebase временно недоступен. Попробуйте ещё раз.";
   return "Не удалось сохранить игру. Проверьте соединение и настройки Firestore.";
+}
+
+export function getLessonRecordErrorMessage(error) {
+  if (error?.message === "INVALID_LESSON_STUDENT") return "Не удалось определить ученика для этой записи.";
+  if (error?.message === "INVALID_LESSON_DATE") return "Укажите дату занятия.";
+  if (error?.message === "INVALID_LESSON_CONTENT") return "Заполните поле «Что делали» (до 2000 символов).";
+  if (error?.message === "INVALID_LESSON_RESULT") return "Заполните поле «Что получилось / что пока трудно» (до 2000 символов).";
+  if (error?.message === "INVALID_LESSON_SUPPORT") return "Выберите хотя бы один вариант в блоке «Что помогло».";
+  if (error?.message === "INVALID_LESSON_NEXT_STEP") return "Заполните поле «Что взять на следующий урок» (до 2000 символов).";
+  if (error?.message?.startsWith("INVALID_LESSON_")) return "Проверьте заполнение карточки занятия.";
+  if (error?.code === "permission-denied") {
+    return "Firestore Rules пока не разрешают работу с коллекцией lesson_records.";
+  }
+  if (error?.code === "unavailable") return "Firebase временно недоступен. Попробуйте ещё раз.";
+  return "Не удалось сохранить изменения. Проверьте соединение и настройки Firestore.";
 }

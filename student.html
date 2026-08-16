@@ -45,79 +45,282 @@
 
       <div id="page-error" class="notice notice--error" role="alert" hidden></div>
 
-      <section class="stats-grid stats-grid--three" aria-label="Статистика ученика">
-        <article class="stat-card">
-          <span class="stat-card__label">Всего попыток</span>
-          <strong id="attempts-count">—</strong>
-          <span>за всё время</span>
-        </article>
-        <article class="stat-card stat-card--accent">
-          <span class="stat-card__label">Средний результат</span>
-          <strong id="average-result">—</strong>
-          <span>завершённые попытки</span>
-        </article>
-        <article class="stat-card">
-          <span class="stat-card__label">Лучший результат</span>
-          <strong id="best-result">—</strong>
-          <span>личный максимум</span>
-        </article>
+      <nav class="student-tabs" aria-label="Разделы карточки ученика">
+        <a id="overview-tab" class="student-tab student-tab--active" href="#overview" aria-current="page">Обзор</a>
+        <a id="lessons-tab" class="student-tab" href="#lessons">Занятия</a>
+        <a id="student-games-tab" class="student-tab" href="#games">Игры</a>
+      </nav>
+
+      <section id="overview-view" class="student-view" aria-labelledby="overview-tab">
+        <div class="stats-grid stats-grid--three" aria-label="Статистика ученика">
+          <article class="stat-card">
+            <span class="stat-card__label">Всего попыток</span>
+            <strong id="attempts-count">—</strong>
+            <span>за всё время</span>
+          </article>
+          <article class="stat-card stat-card--accent">
+            <span class="stat-card__label">Средний результат</span>
+            <strong id="average-result">—</strong>
+            <span>завершённые попытки</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-card__label">Лучший результат</span>
+            <strong id="best-result">—</strong>
+            <span>личный максимум</span>
+          </article>
+        </div>
+
+        <section class="panel overview-note" aria-label="Разделы карточки">
+          <div>
+            <span class="overview-note__icon" aria-hidden="true">★</span>
+            <div>
+              <h2>Карточка ученика</h2>
+              <p class="muted">В «Занятиях» сохраняются наблюдения педагога, а в «Играх» — персональные ссылки и результаты попыток.</p>
+            </div>
+          </div>
+        </section>
       </section>
 
-      <section class="panel game-links-panel" aria-labelledby="game-links-title">
-        <div class="panel__header">
-          <div>
-            <h2 id="game-links-title">Персональные ссылки на игры</h2>
-            <p class="muted small">Отправьте ученику ссылку на нужную игру.</p>
+      <section id="lessons-view" class="student-view" aria-labelledby="lessons-tab" hidden>
+        <section class="panel lessons-panel" aria-labelledby="lessons-title">
+          <div class="panel__header lessons-header">
+            <div>
+              <h2 id="lessons-title">История занятий</h2>
+              <p id="lessons-subtitle" class="muted small">Загрузка данных…</p>
+            </div>
+            <button id="add-lesson-button" class="button button--primary" type="button" disabled>+ Добавить занятие</button>
           </div>
-        </div>
-        <div id="game-links-list" class="game-links-list"></div>
-        <div id="game-links-empty" class="empty-state empty-state--compact" hidden>
-          <p>Нет активных игр с указанным адресом.</p>
-        </div>
+          <div id="lessons-error" class="notice notice--error lessons-notice" role="alert" hidden></div>
+          <div id="lessons-success" class="notice notice--success lessons-notice" role="status" hidden></div>
+          <div id="lessons-loading" class="loading-state" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Загружаем занятия…</span>
+          </div>
+          <div id="lessons-empty" class="empty-state" hidden>
+            <span class="empty-state__icon" aria-hidden="true">☆</span>
+            <h3>Занятий пока нет</h3>
+            <p>Добавьте первую запись после урока — она появится здесь.</p>
+          </div>
+          <div id="lessons-list" class="lessons-list"></div>
+        </section>
       </section>
 
-      <section class="panel" aria-labelledby="history-title">
-        <div class="panel__header">
-          <div>
-            <h2 id="history-title">История попыток</h2>
-            <p id="history-subtitle" class="muted small">Загрузка данных…</p>
+      <section id="games-view" class="student-view" aria-labelledby="student-games-tab" hidden>
+        <section class="panel game-links-panel" aria-labelledby="game-links-title">
+          <div class="panel__header">
+            <div>
+              <h2 id="game-links-title">Персональные ссылки на игры</h2>
+              <p class="muted small">Отправьте ученику ссылку на нужную игру.</p>
+            </div>
           </div>
-          <label class="select-field">
-            <span>Игра</span>
-            <select id="game-filter" disabled>
-              <option value="">Все игры</option>
-            </select>
+          <div id="game-links-list" class="game-links-list"></div>
+          <div id="game-links-empty" class="empty-state empty-state--compact" hidden>
+            <p>Нет активных игр с указанным адресом.</p>
+          </div>
+        </section>
+
+        <section class="panel" aria-labelledby="history-title">
+          <div class="panel__header">
+            <div>
+              <h2 id="history-title">История попыток</h2>
+              <p id="history-subtitle" class="muted small">Загрузка данных…</p>
+            </div>
+            <label class="select-field">
+              <span>Игра</span>
+              <select id="game-filter" disabled>
+                <option value="">Все игры</option>
+              </select>
+            </label>
+          </div>
+
+          <div id="history-loading" class="loading-state" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Загружаем историю…</span>
+          </div>
+
+          <div id="history-empty" class="empty-state" hidden>
+            <span class="empty-state__icon" aria-hidden="true">☆</span>
+            <h3>Попыток пока нет</h3>
+            <p id="history-empty-text">Результаты появятся после подключения и прохождения игры.</p>
+          </div>
+
+          <div id="history-table-wrap" class="table-wrap" hidden>
+            <table>
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Игра</th>
+                  <th>Результат</th>
+                  <th>Ошибки</th>
+                  <th>Время</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody id="history-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="lesson-dialog" class="modal lesson-modal">
+      <form id="lesson-form" class="modal__card lesson-form" method="dialog" novalidate>
+        <div class="modal__header">
+          <div>
+            <p class="eyebrow">Журнал занятий</p>
+            <h2 id="lesson-dialog-title">Добавить занятие</h2>
+          </div>
+          <button id="close-lesson-dialog" class="modal__close" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="lesson-meta-grid">
+          <label class="field">
+            <span>Ученик</span>
+            <input id="lesson-student-name" type="text" readonly>
+          </label>
+          <label class="field">
+            <span>student_id</span>
+            <input id="lesson-student-id" type="text" readonly>
+          </label>
+          <label class="field">
+            <span>Дата</span>
+            <input id="lesson-date" type="date" required>
           </label>
         </div>
 
-        <div id="history-loading" class="loading-state" role="status">
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Загружаем историю…</span>
+        <div class="form-stack lesson-main-fields">
+          <label class="field">
+            <span>Что делали</span>
+            <textarea id="lesson-content" maxlength="2000" rows="3" placeholder="Лёгкий текст, Past Simple, object pronouns, задание ВПР." required></textarea>
+          </label>
+
+          <label class="field">
+            <span>Что получилось / что пока трудно</span>
+            <textarea id="lesson-result" maxlength="2000" rows="3" placeholder="Текст понимает самостоятельно. В вопросах Past Simple ещё бывают ошибки." required></textarea>
+          </label>
+
+          <fieldset class="choice-fieldset">
+            <legend>Что помогло / при каких условиях получилось</legend>
+            <div id="support-options" class="chip-options">
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="самостоятельно"><span>самостоятельно</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="после примера"><span>после примера</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="после 2–3 совместных шагов"><span>после 2–3 совместных шагов</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="с визуальной опорой"><span>с визуальной опорой</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="с пошаговой помощью"><span>с пошаговой помощью</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="домики"><span>домики</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="карточки"><span>карточки</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="схема"><span>схема</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="рисунок"><span>рисунок</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="упрощённый алгоритм"><span>упрощённый алгоритм</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="лёгкий старт"><span>лёгкий старт</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="знакомый формат"><span>знакомый формат</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="знакомый школьный материал"><span>знакомый школьный материал</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="после повторения инструкции"><span>после повторения инструкции</span></label>
+              <label class="choice-chip"><input type="checkbox" name="support_used" value="другое"><span>другое</span></label>
+            </div>
+            <input id="support-custom" class="choice-custom-input" type="text" maxlength="150" placeholder="Свой вариант (необязательно)">
+          </fieldset>
+
+          <label class="field">
+            <span>Что взять на следующий урок</span>
+            <textarea id="lesson-next-step" maxlength="2000" rows="3" placeholder="Закрепить вопросительные предложения Past Simple без предварительного разбора." required></textarea>
+          </label>
         </div>
 
-        <div id="history-empty" class="empty-state" hidden>
-          <span class="empty-state__icon" aria-hidden="true">☆</span>
-          <h3>Попыток пока нет</h3>
-          <p id="history-empty-text">Результаты появятся после подключения и прохождения игры.</p>
-        </div>
+        <details class="lesson-additional">
+          <summary>Дополнительно <span>необязательно</span></summary>
+          <div class="lesson-additional__content">
+            <fieldset class="choice-fieldset">
+              <legend>Состояние / включённость</legend>
+              <div id="engagement-options" class="chip-options">
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="обычное рабочее состояние"><span>обычное рабочее состояние</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="спокойное"><span>спокойное</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="быстро включился"><span>быстро включился</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="усталость"><span>усталость</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="отвлекался"><span>отвлекался</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="сопротивление в начале"><span>сопротивление в начале</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="сопротивление при усложнении"><span>сопротивление при усложнении</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="часто отвечает «не помню»"><span>часто отвечает «не помню»</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="тревожится из-за ошибок"><span>тревожится из-за ошибок</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="работает медленно"><span>работает медленно</span></label>
+                <label class="choice-chip"><input type="checkbox" name="engagement_state" value="другое"><span>другое</span></label>
+              </div>
+              <input id="engagement-custom" class="choice-custom-input" type="text" maxlength="150" placeholder="Свой вариант (необязательно)">
+            </fieldset>
 
-        <div id="history-table-wrap" class="table-wrap" hidden>
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Игра</th>
-                <th>Результат</th>
-                <th>Ошибки</th>
-                <th>Время</th>
-                <th>Статус</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body"></tbody>
-          </table>
+            <div class="lesson-select-grid">
+              <label class="field">
+                <span>Уровень самостоятельности</span>
+                <select id="independence-level">
+                  <option value="">Не указано</option>
+                  <option>самостоятельно</option>
+                  <option>в основном самостоятельно</option>
+                  <option>после примера</option>
+                  <option>с визуальной опорой</option>
+                  <option>с пошаговой помощью</option>
+                  <option>нестабильно</option>
+                  <option>на уровне знакомства</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Тип трудности</span>
+                <select id="difficulty-type">
+                  <option value="">Не указано</option>
+                  <option>не удерживает правило</option>
+                  <option>путает похожие конструкции</option>
+                  <option>знает правило, но не применяет</option>
+                  <option>навык ещё не автоматизирован</option>
+                  <option>торопится</option>
+                  <option>пропускает детали</option>
+                  <option>трудно удерживает инструкцию</option>
+                  <option>трудно удерживает последовательность действий</option>
+                  <option>утомление</option>
+                  <option>сопротивление до начала задания</option>
+                  <option>другое</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Важное наблюдение об ученике</span>
+              <textarea id="teacher-observation" maxlength="3000" rows="3" placeholder="Если задание кажется сложным, сначала отвечает «не помню», но после первого совместного примера включается в работу."></textarea>
+            </label>
+
+            <label class="field private-field">
+              <span>🔒 Личная заметка педагога <small>приватно</small></span>
+              <textarea id="private-teacher-note" maxlength="3000" rows="3"></textarea>
+              <small class="field-help">Не используется в будущих отчётах для родителей и не передаётся в публичные разделы.</small>
+            </label>
+          </div>
+        </details>
+
+        <p id="lesson-form-error" class="form-error" role="alert" aria-live="polite"></p>
+        <div class="modal__actions lesson-form-actions">
+          <button id="cancel-lesson-button" class="button button--secondary" type="button">Отмена</button>
+          <button id="save-lesson-button" class="button button--primary" type="submit">
+            <span class="button__label">Сохранить</span>
+            <span class="spinner spinner--button" aria-hidden="true" hidden></span>
+          </button>
         </div>
-      </section>
-    </main>
+      </form>
+    </dialog>
+
+    <dialog id="lesson-view-dialog" class="modal lesson-view-modal">
+      <article class="modal__card lesson-record-details">
+        <div class="modal__header">
+          <div>
+            <p class="eyebrow">Карточка занятия</p>
+            <h2 id="lesson-view-date">—</h2>
+          </div>
+          <button id="close-lesson-view" class="modal__close" type="button" aria-label="Закрыть">×</button>
+        </div>
+        <div id="lesson-view-content" class="lesson-record-details__content"></div>
+        <div class="modal__actions">
+          <button id="delete-lesson-button" class="button button--danger" type="button">Удалить</button>
+          <button id="edit-lesson-button" class="button button--primary" type="button">Редактировать</button>
+        </div>
+      </article>
+    </dialog>
     <script type="module" src="js/student-page.js"></script>
   </body>
 </html>
