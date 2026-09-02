@@ -1,24 +1,24 @@
-import { firebaseConfig } from "./firebase-config.js";
+import { testGameReporterConfig } from "./reporter-config.js";
 import {
   getGameReporterErrorMessage,
   initializeGameReporter
 } from "../shared/v1/game-reporter.js";
 
-const GAME_ID = "forest-trails";
 const TEST_RESULT = Object.freeze({
   correctAnswers: 8,
   totalTasks: 10,
   errors: 2,
   percentage: 80,
   durationSeconds: 95,
-  completed: true
+  completed: true,
+  topic: "Forest Trails test"
 });
 
 const button = document.querySelector("#send-test-result");
 const buttonLabel = button.querySelector(".button__label");
 const buttonSpinner = button.querySelector(".spinner");
 const status = document.querySelector("#test-status");
-const studentValue = document.querySelector("#student-value");
+const assignmentValue = document.querySelector("#assignment-value");
 let reporter = null;
 
 function showStatus(message, type) {
@@ -34,12 +34,12 @@ function setSending(isSending) {
 }
 
 try {
-  reporter = initializeGameReporter({ firebaseConfig, gameId: GAME_ID });
-  studentValue.textContent = reporter.studentId;
+  reporter = initializeGameReporter(testGameReporterConfig);
+  assignmentValue.textContent = "получен";
   button.disabled = false;
 } catch (error) {
-  console.error("Ошибка подготовки теста:", error);
-  studentValue.textContent = "не указан";
+  console.error("Ошибка подготовки теста:", { code: error?.code });
+  assignmentValue.textContent = "не указан";
   showStatus(getGameReporterErrorMessage(error), "error");
 }
 
@@ -53,14 +53,14 @@ button.addEventListener("click", async () => {
     buttonSpinner.hidden = true;
     button.disabled = true;
     showStatus(
-      `Готово! Результат ученика ${savedResult.studentId} сохранён. ID документа: ${savedResult.documentId}`,
+      `Готово! Результат сохранён в neurostars-api. ID результата: ${savedResult.resultId}`,
       "success"
     );
   } catch (error) {
-    console.error("Ошибка тестовой отправки:", error);
+    console.error("Ошибка тестовой отправки:", { code: error?.code });
     buttonLabel.textContent = "Попытка отправки завершена";
     buttonSpinner.hidden = true;
     button.disabled = true;
-    showStatus(`${getGameReporterErrorMessage(error)} Проверьте Firestore Rules и консоль браузера.`, "error");
+    showStatus(getGameReporterErrorMessage(error), "error");
   }
 });

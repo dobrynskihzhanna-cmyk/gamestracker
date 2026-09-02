@@ -12,10 +12,10 @@
       <section class="test-card" aria-labelledby="test-title">
         <p class="eyebrow">Служебная тестовая страница</p>
         <h1 id="test-title">Проверка отправки результата</h1>
-        <p class="muted">Страница создаст одну тестовую попытку в коллекции <code>gameResults</code>.</p>
+        <p class="muted">Страница отправит одну тестовую попытку в <code>neurostars-api</code> по публичному assignment token.</p>
 
         <dl class="test-details">
-          <div><dt>Ученик</dt><dd id="student-value">—</dd></div>
+          <div><dt>Assignment token</dt><dd id="assignment-value">—</dd></div>
           <div><dt>Игра</dt><dd>forest-trails</dd></div>
           <div><dt>Правильных ответов</dt><dd>8 из 10</dd></div>
           <div><dt>Ошибок</dt><dd>2</dd></div>
@@ -30,7 +30,7 @@
           <span class="spinner spinner--button" aria-hidden="true" hidden></span>
         </button>
 
-        <p class="privacy-note">Кнопка работает только один раз за эту попытку. Повторное нажатие не создаст второй документ.</p>
+        <p class="privacy-note">Откройте страницу с параметрами <code>?activity=forest-trails&amp;assignment=&lt;PUBLIC_ASSIGNMENT_TOKEN&gt;</code>. Имя ученика и Firebase studentId в игру не передаются.</p>
       </section>
     </main>
     <script type="module" src="js/test-game-result-page.js"></script>
