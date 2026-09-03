@@ -203,6 +203,26 @@ function validateResult(result, topicMaxLength = FIREBASE_TOPIC_MAX_LENGTH) {
   };
 }
 
+function validateApiDetails(value) {
+  if (value === undefined) return {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new GameReporterError(
+      GameReporterErrorCode.INVALID_RESULT,
+      "Поле details должно быть объектом."
+    );
+  }
+
+  try {
+    JSON.stringify(value);
+  } catch {
+    throw new GameReporterError(
+      GameReporterErrorCode.INVALID_RESULT,
+      "Поле details должно содержать данные в формате JSON."
+    );
+  }
+  return value;
+}
+
 function getReporterApp(firebaseConfig, firebase) {
   const { getApps, initializeApp } = firebase;
   const existingApp = getApps().find((app) => app.name === REPORTER_APP_NAME);
@@ -355,6 +375,7 @@ export function initializeGameReporter(options) {
 
   async function submitToApi(result) {
     const validatedResult = validateResult(result, API_TOPIC_MAX_LENGTH);
+    const details = validateApiDetails(result.details);
     requireWholeNumber(validatedResult.correctAnswers, "correctAnswers", { max: API_RESULT_LIMIT });
     requireWholeNumber(validatedResult.totalTasks, "totalTasks", { min: 1, max: API_RESULT_LIMIT });
     requireWholeNumber(validatedResult.errors, "errors", { max: API_RESULT_LIMIT });
@@ -372,7 +393,7 @@ export function initializeGameReporter(options) {
           activityId,
           resultVersion: REPORTER_VERSION,
           ...validatedResult,
-          details: {}
+          details
         })
       });
     } catch (error) {

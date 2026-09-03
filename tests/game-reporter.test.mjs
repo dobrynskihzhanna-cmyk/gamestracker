@@ -14,7 +14,8 @@ const result = {
   percentage: 80,
   durationSeconds: 95,
   completed: true,
-  topic: "Forest Trails test"
+  topic: "Forest Trails test",
+  details: { level: "fox-trail" }
 };
 
 test("test page reads assignment and activity from the query string", () => {
@@ -108,7 +109,7 @@ test("API reporter submits the existing neurostars-api contract", async () => {
   assert.equal(body.assignment, assignment);
   assert.equal(body.activityId, "forest-trails");
   assert.equal(body.resultVersion, 1);
-  assert.deepEqual(body.details, {});
+  assert.deepEqual(body.details, { level: "fox-trail" });
   assert.equal(saved.resultId, body.resultId);
   assert.equal("studentId" in saved, false);
   assert.equal("gameId" in saved, false);
