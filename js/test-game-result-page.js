@@ -1,4 +1,5 @@
 import { testGameReporterConfig } from "./reporter-config.js";
+import { parseTestGameResultQuery } from "./test-game-result-query.js";
 import {
   getGameReporterErrorMessage,
   initializeGameReporter
@@ -18,8 +19,13 @@ const button = document.querySelector("#send-test-result");
 const buttonLabel = button.querySelector(".button__label");
 const buttonSpinner = button.querySelector(".spinner");
 const status = document.querySelector("#test-status");
-const assignmentValue = document.querySelector("#assignment-value");
+const assignmentPresent = document.querySelector("#assignment-present");
+const activityValue = document.querySelector("#activity-value");
+const query = parseTestGameResultQuery(window.location.search);
 let reporter = null;
+
+assignmentPresent.textContent = query.assignment ? "yes" : "no";
+activityValue.textContent = query.activityId || "не указано";
 
 function showStatus(message, type) {
   status.className = `notice notice--${type}`;
@@ -34,12 +40,14 @@ function setSending(isSending) {
 }
 
 try {
-  reporter = initializeGameReporter(testGameReporterConfig);
-  assignmentValue.textContent = "получен";
+  reporter = initializeGameReporter({
+    ...testGameReporterConfig,
+    assignment: query.assignment,
+    activityId: query.activityId
+  });
   button.disabled = false;
 } catch (error) {
   console.error("Ошибка подготовки теста:", { code: error?.code });
-  assignmentValue.textContent = "не указан";
   showStatus(getGameReporterErrorMessage(error), "error");
 }
 
